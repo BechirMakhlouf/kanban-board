@@ -25,7 +25,7 @@ export const KanbanColumn = (
   const columnContent: ColumnContent = columns[props.columnIndex];
 
   return (
-    <div className="border-2 m-4 p-4 min-h-[28rem] min-w-[24rem] max-w-full bg-gray-900">
+    <div className="border-2 border-zinc-500 m-4 p-4 min-h-[28rem] min-w-[24rem] max-w-full bg-gray-900 no-scrollbar">
       <div className="flex justify-between">
         <h1
           className="min-w-[150px] text-3xl text-primary w-full"
