@@ -1,6 +1,15 @@
 import { create } from "zustand";
 import { ColumnContent, KanbanColumn } from "./components/KanbanColumn";
 import { ItemContent } from "./components/KanbanItem";
+import {
+  closestCorners,
+  DndContext,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 
 export const useStore = create((set) => ({
   items: new Map<string, ItemContent>(),
@@ -34,26 +43,53 @@ export const useStore = create((set) => ({
 
 function App() {
   const { columns, addColumn } = useStore((state) => state as any);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
+
   return (
     <>
       <h1 className="text-3xl text-center  m-2">Kanban Board</h1>
-      <div className="max-w-full border-zinc-500 border-2 m-8 flex justify-center rounded bg-gray-950 overflow-x-scroll">
-        {columns.map((columnContent: ColumnContent, index: number) => (
-          <KanbanColumn
-            key={columnContent.id}
-            columnIndex={index}
-            columnContent={columnContent}
-          />
-        ))}
-        <div
-          className="p-2 self-center text-4xl cursor-pointer"
-          onClick={() => {
-            addColumn(new ColumnContent("another"));
-          }}
-        >
-          +
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragOver={(e) => {
+          e;
+          // console.log(e.over?.id);
+          // console.log(
+          //   (columns as ColumnContent[]).find((column) =>
+          //     column.id === e.over?.id
+          //   )?.containedItems,
+          // );
+        }}
+        onDragEnd={(e) => {
+          e;
+          
+          console.log(e.over?.id)
+        }}
+      >
+        <div className="max-w-full border-zinc-500 border-2 m-8 flex justify-center rounded bg-gray-950 ">
+          {columns.map((columnContent: ColumnContent, index: number) => (
+            <KanbanColumn
+              key={columnContent.id}
+              columnIndex={index}
+              columnContent={columnContent}
+            />
+          ))}
+          <div
+            className="p-2 self-center text-4xl cursor-pointer"
+            onClick={() => {
+              addColumn(new ColumnContent("another"));
+            }}
+          >
+            +
+          </div>
         </div>
-      </div>
+      </DndContext>
     </>
   );
 }
